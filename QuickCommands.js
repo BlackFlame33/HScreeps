@@ -114,11 +114,16 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'W49N31';
+const roomName = 'E9N5';
+const flags = _.filter(Game.flags, function (flag) {return flag.pos.roomName === roomName;});
+for (const flagKey in flags) {
+    flags[flagKey].remove();
+}
+delete Memory.MemRooms[roomName];
 const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
 const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
 const myCreeps = Game.rooms[roomName].find(FIND_MY_CREEPS);
-const flags = Game.rooms[roomName].find(FIND_FLAGS);
+
 for (const structureKey in structures) {
     structures[structureKey].destroy();
 }
@@ -128,11 +133,7 @@ for (const constructionKey in constructions) {
 for (const myCreepKey in myCreeps) {
     myCreeps[myCreepKey].suicide();
 }
-for (const flagKey in flags) {
-    flags[flagKey].remove();
-}
 Game.rooms[roomName].controller.unclaim();
-delete Memory.MemRooms[roomName];
 // -----------------------------------------------
 
 // get available energy in room

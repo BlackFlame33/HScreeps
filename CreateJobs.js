@@ -895,7 +895,9 @@ const CreateJobs = {
             const commodity = COMMODITIES[resToProduce];
             if (commodity.level === undefined || factory.level === commodity.level) {
                 for (const component in commodity.components) {
-                    if (component !== RESOURCE_ENERGY && factory.store.getUsedCapacity(component) < Util.FACTORY_TARGET_RESOURCE && (factory.room.storage.store.getUsedCapacity(component) > 0 || factory.room.terminal.store.getUsedCapacity(component) > 0)) {
+                    if (component !== RESOURCE_ENERGY
+                        && factory.store.getUsedCapacity(component) <= (commodity.components[component] * 2)
+                        && (factory.room.storage.store.getUsedCapacity(component) > 0 || factory.room.terminal.store.getUsedCapacity(component) > 0)) {
                         roomJobs = AddJob(roomJobs, 'FillFctr(' + component + ')' + factory.room.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
                 }
