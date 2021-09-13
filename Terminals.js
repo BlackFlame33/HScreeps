@@ -65,7 +65,7 @@ const Terminals = {
         function GetLabResources(toTerminal, terminals) {
             const flags = toTerminal.room.find(FIND_FLAGS, {
                 filter: function (flag) {
-                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
+                    return Util.IsLabMineralFlag(flag);
                 }
             });
             if (flags.length > 0) {

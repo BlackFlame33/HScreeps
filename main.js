@@ -180,7 +180,7 @@ module.exports.loop = function () {
                     if (gameRoom.controller && gameRoom.controller.level > 0) {
                         if (!memRoom.MainSpawnId) {
                             const constructSpawnFlag = _.filter(Game.flags, function (flag) {
-                                return flag.pos.roomName === memRoomKey && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                                return flag.pos.roomName === memRoomKey && Util.IsConstructSpawnFlag(flag);
                             })[0];
                             if (!constructSpawnFlag) {
                                 new RoomVisual(memRoomKey).text('NO SPAWN!', 25, 25);

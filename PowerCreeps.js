@@ -6,7 +6,7 @@ const PowerCreeps = {
 
         function RunPowerCreeps() {
             const powerCreepSpawnFlags = _.filter(Game.flags, function (flag) {
-                return flag.color === COLOR_BLUE && flag.secondaryColor === COLOR_ORANGE;
+                return Util.IsPowerCreepSpawnFlag(flag);
             });
             for (const powerCreepKey in Game.powerCreeps) {
                 const powerCreep = Game.powerCreeps[powerCreepKey];
@@ -26,6 +26,7 @@ const PowerCreeps = {
                         })[0];
                         if (powerSpawn) {
                             result = powerCreep.spawn(powerSpawn);
+                            
                             Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'spawning ' + powerCreep.name + ' result ' + result + ' (' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ',' + powerSpawn.pos.roomName + ')');
                         } else {
                             Util.ErrorLog('PowerCreeps', 'PowerCreepsActions', 'removed flag, powerSpawn not found ' + flagWithCreepName.name + ' (' + flagWithCreepName.pos.x + ',' + flagWithCreepName.pos.y + ',' + flagWithCreepName.pos.roomName + ')');

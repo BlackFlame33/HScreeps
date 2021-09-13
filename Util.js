@@ -399,5 +399,57 @@ const Util = {
         return closestHostile;
     },
 
+    // Flag checks
+
+    /**@return {boolean}*/
+    IsPowerCreepSpawnFlag: function (flag) {
+        return flag.color === COLOR_BLUE && flag.secondaryColor === COLOR_ORANGE;
+    },
+
+    /**@return {boolean}*/
+    IsPowerBankFlag: function (flag) {
+        return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE;
+    },
+
+    /**@return {boolean}*/
+    IsDepositFlag: function (flag) {
+        return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN;
+    },
+
+    /**@return {boolean}*/
+    IsLabFlag: function (flag) {
+        return flag.color === COLOR_PURPLE;
+    },
+
+    /**@return {boolean}*/
+    IsLabMineralFlag: function (flag) {
+        return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
+    },
+
+    /**@return {boolean}*/
+    IsConstructSpawnFlag: function (flag) {
+        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+    },
+
+    /**@return {boolean}*/
+    IsDefenderFlag: function (flag) {
+        return flag.color === COLOR_RED && flag.secondaryColor === COLOR_RED;
+    },
+
+    /**@return {boolean}*/
+    IsTagControllerFlag: function (flag) {
+        return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_ORANGE;
+    },
+    
+    /**@return {boolean}*/
+    IsObserverFlag: function (flag) {
+        return flag.color === COLOR_ORANGE;
+    },
+    
+    /**@return {boolean}*/
+    IsObserverScanPowerBanksAndDepositsFlag: function (flag) {
+        return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_RED;
+    },
+
 };
 module.exports = Util;

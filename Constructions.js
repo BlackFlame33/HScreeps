@@ -30,7 +30,7 @@ const Constructions = {
                 }
                 const flags = gameRoom.find(FIND_FLAGS, {
                     filter: function (flag) { // construction flags
-                        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY; // construct first spawn
+                        return Util.IsConstructSpawnFlag(flag);
                     }
                 });
                 let isBuildingCounter = 0;
@@ -180,7 +180,7 @@ const Constructions = {
         /**@return {number}*/
         function ConstructFirstSpawnAtFlag(gameRoom, flags) {
             const constructSpawnFlag = _.filter(flags, function (flag) {
-                return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                return Util.IsConstructSpawnFlag(flag);
             })[0];
             if (constructSpawnFlag) {
                 // cleanup
@@ -203,7 +203,7 @@ const Constructions = {
                 const defenderFlagName = 'Defend build site ' + gameRoom.name;
                 const defenderFlag = constructSpawnFlag.pos.findInRange(FIND_FLAGS, 1, {
                     filter: function (flag) {
-                        return flag.name === defenderFlagName && flag.color === COLOR_RED && flag.secondaryColor === COLOR_RED;
+                        return flag.name === defenderFlagName && Util.IsDefenderFlag(flag);
                     }
                 })[0];
                 if (!defenderFlag) {

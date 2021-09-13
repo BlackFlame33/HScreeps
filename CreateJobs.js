@@ -385,8 +385,8 @@ const CreateJobs = {
 
         function TagControllerJobs(gameRoom) {
             if (gameRoom.controller) {
-                const existingTagFlag = _.find(gameRoom.controller.pos.lookFor(LOOK_FLAGS), function (f) {
-                    return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_ORANGE;
+                const existingTagFlag = _.find(gameRoom.controller.pos.lookFor(LOOK_FLAGS), function (flag) {
+                    return Util.IsTagControllerFlag(flag);
                 });
                 if (!existingTagFlag) {
                     const tag = 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name;

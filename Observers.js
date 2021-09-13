@@ -19,11 +19,11 @@ const Observers = {
             }
             if (observer) {
                 const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
-                if (flagAtObserver && flagAtObserver.color === COLOR_ORANGE) {
+                if (flagAtObserver && Util.IsObserverFlag(flagAtObserver)) {
                     if (!Memory.MemRooms[observerRoomKey].MapScan || Memory.MemRooms[observerRoomKey].MapReScan) {
                         CreateScan(observerRoomKey);
                     }
-                    if (flagAtObserver.secondaryColor === COLOR_RED) { // observer is dedicated to scanning for power banks or deposits
+                    if (Util.IsObserverScanPowerBanksAndDepositsFlag(flagAtObserver)) { // observer is dedicated to scanning for power banks or deposits
                         ScanPowerBanksAndDeposits(observerRoomKey, observer);
                     }
                 }
@@ -120,12 +120,12 @@ const Observers = {
             // make sure that there are no flags in the room that should be vacated
             const flags = Game.rooms[roomKey].find(FIND_FLAGS, {
                 filter: function (flag) {
-                    return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE;
+                    return Util.IsDepositFlag(flag) || Util.IsPowerBankFlag(flag);
                 }
             });
             for (const flagKey in flags) {
                 const flag = flags[flagKey];
-                if (flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE && observerRoom.PowerBankFlag.pos.roomName === roomKey) {
+                if (Util.IsPowerBankFlag(flag) && observerRoom.PowerBankFlag.pos.roomName === roomKey) {
                     Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'delete ' + JSON.stringify(observerRoom.PowerBankFlag));
                     delete observerRoom.PowerBankFlag;
                 }
