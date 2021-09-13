@@ -26,7 +26,9 @@ const PowerCreeps = {
                         })[0];
                         if (powerSpawn) {
                             result = powerCreep.spawn(powerSpawn);
-                            
+                            for (const memoryElementKey in Memory.powerCreeps[idleCreep.name]) {
+                                Memory.powerCreeps[powerCreep.name][memoryElementKey] = undefined; // clear memory
+                            }
                             Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'spawning ' + powerCreep.name + ' result ' + result + ' (' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ',' + powerSpawn.pos.roomName + ')');
                         } else {
                             Util.ErrorLog('PowerCreeps', 'PowerCreepsActions', 'removed flag, powerSpawn not found ' + flagWithCreepName.name + ' (' + flagWithCreepName.pos.x + ',' + flagWithCreepName.pos.y + ',' + flagWithCreepName.pos.roomName + ')');
