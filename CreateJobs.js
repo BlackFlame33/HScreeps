@@ -143,6 +143,8 @@ const CreateJobs = {
                                         if (gameRoom.controller.level === 8) {
                                             FillPowerSpawnEnergyJobs(gameRoom, jobs);
                                             FillPowerSpawnPowerJobs(gameRoom, jobs);
+                                            FillNukerEnergyJobs(gameRoom, jobs);
+                                            FillNukerGhodiumJobs(gameRoom, jobs);
                                         }
                                     }
                                 }
@@ -419,9 +421,9 @@ const CreateJobs = {
                 AddJob(roomJobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
             }
             if ((!gameRoom.storage
-                || gameRoom.storage
-                && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM
-                && gameRoom.controller.level < 8)
+                    || gameRoom.storage
+                    && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM
+                    && gameRoom.controller.level < 8)
                 && gameRoom.find(FIND_CONSTRUCTION_SITES).length === 0 // if there are any constructions - try to fokus finishing them first
             ) {
                 AddJob(roomJobs, 'Ctrl1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
@@ -502,6 +504,30 @@ const CreateJobs = {
                 const fillTower = fillTowers[fillTowerKey];
                 new RoomVisual(gameRoom.name).text('🗼', fillTower.pos.x, fillTower.pos.y);
                 AddJob(roomJobs, 'FillTwr(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, Util.OBJECT_JOB, 'T');
+            }
+        }
+
+        function FillNukerEnergyJobs(gameRoom, roomJobs) {
+            const nuker = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: (s) => {
+                    return s.structureType === STRUCTURE_NUKER && s.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                }
+            })[0];
+            if (nuker) {
+                new RoomVisual(gameRoom.name).text('💣', nuker.pos.x, nuker.pos.y);
+                AddJob(roomJobs, 'FillNkrE(' + nuker.pos.x + ',' + nuker.pos.y + ')' + gameRoom.name, nuker.id, Util.OBJECT_JOB, 'T');
+            }
+        }
+
+        function FillNukerGhodiumJobs(gameRoom, roomJobs) {
+            const nuker = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: (s) => {
+                    return s.structureType === STRUCTURE_NUKER && s.store.getFreeCapacity(RESOURCE_GHODIUM) > 0;
+                }
+            })[0];
+            if (nuker) {
+                new RoomVisual(gameRoom.name).text('💣', nuker.pos.x, nuker.pos.y);
+                AddJob(roomJobs, 'FillNkrG(' + nuker.pos.x + ',' + nuker.pos.y + ')' + gameRoom.name, nuker.id, Util.OBJECT_JOB, 'T');
             }
         }
 
