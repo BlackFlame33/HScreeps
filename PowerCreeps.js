@@ -26,7 +26,7 @@ const PowerCreeps = {
                         })[0];
                         if (powerSpawn) {
                             result = powerCreep.spawn(powerSpawn);
-                            for (const memoryElementKey in Memory.powerCreeps[idleCreep.name]) {
+                            for (const memoryElementKey in Memory.powerCreeps[powerCreep.name]) {
                                 Memory.powerCreeps[powerCreep.name][memoryElementKey] = undefined; // clear memory
                             }
                             Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'spawning ' + powerCreep.name + ' result ' + result + ' (' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ',' + powerSpawn.pos.roomName + ')');
