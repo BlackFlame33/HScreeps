@@ -96,10 +96,28 @@ const Terminals = {
         }
 
         function GetEnergy(toTerminal, terminals) {
-            if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
+            const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
+            if (
+                !toTerminal.store.getUsedCapacity(RESOURCE_ENERGY)
+                && (
+                    toTerminal.room.storage
+                    && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)
+                    || !toTerminal.room.storage
+                )
+                // battery check
+                && (
+                    memRoom.FctrId !== '-'
+                    && !toTerminal.store.getUsedCapacity(RESOURCE_BATTERY)
+                    && (
+                        toTerminal.room.storage
+                        && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_BATTERY)
+                        || !toTerminal.room.storage
+                    )
+                    || memRoom.FctrId === '-'
+                )
+            ) {
                 let didSend = false;
                 let resource = RESOURCE_BATTERY;
-                const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if (toTerminal.room.controller.level === 8 || memRoom.FctrId !== '-') {
                     didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, resource, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }

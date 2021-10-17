@@ -114,7 +114,7 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'E9N5';
+const roomName = 'W48N49';
 const flags = _.filter(Game.flags, function (flag) {return flag.pos.roomName === roomName;});
 for (const flagKey in flags) {
     flags[flagKey].remove();

@@ -34,7 +34,7 @@ const PowerCreeps = {
                             Util.ErrorLog('PowerCreeps', 'PowerCreepsActions', 'removed flag, powerSpawn not found ' + flagWithCreepName.name + ' (' + flagWithCreepName.pos.x + ',' + flagWithCreepName.pos.y + ',' + flagWithCreepName.pos.roomName + ')');
                             flagWithCreepName.remove();
                         }
-                    } else if (powerCreep.shard) { // flag is found and the creep is spawned - do something
+                    } else if (powerCreep.shard && Memory.powerCreeps) { // flag is found and the creep is spawned - do something
                         if (Memory.powerCreeps[powerCreep.name].JobName && !Memory.powerCreeps[powerCreep.name].JobName.startsWith('Unemployed')) {
                             result = PowerCreepsActions(powerCreep);
                         } else {
