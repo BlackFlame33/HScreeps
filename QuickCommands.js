@@ -57,15 +57,17 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
-// destroy all structures
-const structures = Game.rooms['W51N41'].find(FIND_STRUCTURES);
+// destroy all structures - filtered
+const structures = Game.rooms['E34N11'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
+    if(structures[structureKey].structureType === STRUCTURE_RAMPART){
         structures[structureKey].destroy();
+    }
 }
 // destroy all constructions
 
 for(const roomName in Memory.MemRooms){
-    const constructions = Game.rooms[/*roomName*/'W51N31'].find(FIND_CONSTRUCTION_SITES);
+    const constructions = Game.rooms[/*roomName*/'E9N4'].find(FIND_CONSTRUCTION_SITES);
     for (const key in constructions) {
         console.log('removed ' + constructions[key].structureType + ' ' + constructions[key].pos);
         constructions[key].remove();
@@ -112,11 +114,16 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'W49N31';
+const roomName = 'W48N49';
+const flags = _.filter(Game.flags, function (flag) {return flag.pos.roomName === roomName;});
+for (const flagKey in flags) {
+    flags[flagKey].remove();
+}
+delete Memory.MemRooms[roomName];
 const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
 const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
 const myCreeps = Game.rooms[roomName].find(FIND_MY_CREEPS);
-const flags = Game.rooms[roomName].find(FIND_FLAGS);
+
 for (const structureKey in structures) {
     structures[structureKey].destroy();
 }
@@ -126,11 +133,7 @@ for (const constructionKey in constructions) {
 for (const myCreepKey in myCreeps) {
     myCreeps[myCreepKey].suicide();
 }
-for (const flagKey in flags) {
-    flags[flagKey].remove();
-}
 Game.rooms[roomName].controller.unclaim();
-delete Memory.MemRooms[roomName];
 // -----------------------------------------------
 
 // get available energy in room

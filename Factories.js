@@ -18,7 +18,7 @@ const Factories = {
                     Util.InfoLog('Factories', '', 'add new factory in ' + gameRoomKey + ' FctrId ' + memRoom.FctrId);
                 }
             }
-            if (factory && factory.room.storage) {
+            if (factory && factory.room.storage && factory.room.terminal) {
                 if (factory.cooldown === 0) {
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
@@ -104,11 +104,11 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_GHODIUM_MELT, Util.FACTORY_TARGET_RESOURCE / 2);
                     if (result === OK) return;
-
-                    if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
+                    const storageEnergy = factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY);
+                    if (storageEnergy >= Util.STORAGE_ENERGY_MEDIUM) {
                         result = Produce(factory, RESOURCE_BATTERY, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
-                    } else if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY) {
+                    } else if (storageEnergy === 0 && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY) {
                         result = Produce(factory, RESOURCE_ENERGY, Number.MAX_SAFE_INTEGER);
                         if (result === OK) {
                             Util.Warning('Factories', '', 'extracting energy from batteries in ' + factory.pos.roomName + ' energy status: storage ' + factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) + ' terminal ' + factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY));

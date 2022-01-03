@@ -391,6 +391,12 @@ const ExecuteJobs = {
                     case jobKey.startsWith('FillPSpwnP'):
                         result = JobFillPowerSpawnPower(creep, roomJob);
                         break;
+                    case jobKey.startsWith('FillNkrE'):
+                        result = JobFillNukerEnergy(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillNkrG'):
+                        result = JobFillNukerGhodium(creep, roomJob);
+                        break;
                     default:
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'object type job not found ' + jobKey + ' ' + creep.name);
                 }
@@ -1330,6 +1336,82 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     return FetchResource(creep, fetchObject, RESOURCE_POWER, jobObject.store.getFreeCapacity(RESOURCE_POWER));
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillNukerEnergy(creep, roomJob) {
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) === jobObject.store.getCapacity(RESOURCE_ENERGY)) {
+                        return JOB_IS_DONE;
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
+                        return SHOULD_FETCH;
+                    } else { // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) + jobObject.store.getUsedCapacity(RESOURCE_ENERGY) >= jobObject.store.getCapacity(RESOURCE_ENERGY)) {
+                        return JOB_IS_DONE;
+                    } else {
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchResource(creep, fetchObject, RESOURCE_ENERGY);
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillNukerGhodium(creep, roomJob) {
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (jobObject.store.getUsedCapacity(RESOURCE_GHODIUM) === jobObject.store.getCapacity(RESOURCE_GHODIUM)) {
+                        return JOB_IS_DONE;
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_GHODIUM)) { // fetch
+                        return SHOULD_FETCH;
+                    } else { // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_GHODIUM);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if (creep.store.getUsedCapacity(RESOURCE_GHODIUM) + jobObject.store.getUsedCapacity(RESOURCE_GHODIUM) >= jobObject.store.getCapacity(RESOURCE_GHODIUM)) {
+                        return JOB_IS_DONE;
+                    } else {
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchResource(creep, jobObject, RESOURCE_GHODIUM);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchResource(creep, fetchObject, RESOURCE_GHODIUM);
                 },
             });
             return result;
@@ -2831,8 +2913,8 @@ const ExecuteJobs = {
                     const closestFreeStores = creep.pos.findInRange(FIND_STRUCTURES, maxMoveRange, {
                         filter: function (s) {
                             return (s.structureType === STRUCTURE_CONTAINER
-                                || s.structureType === STRUCTURE_STORAGE
-                                || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
+                                    || s.structureType === STRUCTURE_STORAGE
+                                    || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
                                 && s.store.getFreeCapacity(resourceTypeToStore) >= resourceAmountToStore;
                         }
                     });
@@ -2857,8 +2939,8 @@ const ExecuteJobs = {
                     closestFreeStore = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: function (s) {
                             return (s.structureType === STRUCTURE_CONTAINER
-                                || s.structureType === STRUCTURE_STORAGE
-                                || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
+                                    || s.structureType === STRUCTURE_STORAGE
+                                    || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
                                 && s.store.getFreeCapacity() >= resourceAmountToStore;
                         }
                     });

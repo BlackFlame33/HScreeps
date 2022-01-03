@@ -65,7 +65,7 @@ const Terminals = {
         function GetLabResources(toTerminal, terminals) {
             const flags = toTerminal.room.find(FIND_FLAGS, {
                 filter: function (flag) {
-                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
+                    return Util.IsLabMineralFlag(flag);
                 }
             });
             if (flags.length > 0) {
@@ -96,10 +96,28 @@ const Terminals = {
         }
 
         function GetEnergy(toTerminal, terminals) {
-            if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
+            const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
+            if (
+                !toTerminal.store.getUsedCapacity(RESOURCE_ENERGY)
+                && (
+                    toTerminal.room.storage
+                    && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)
+                    || !toTerminal.room.storage
+                )
+                // battery check
+                && (
+                    memRoom.FctrId !== '-'
+                    && !toTerminal.store.getUsedCapacity(RESOURCE_BATTERY)
+                    && (
+                        toTerminal.room.storage
+                        && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_BATTERY)
+                        || !toTerminal.room.storage
+                    )
+                    || memRoom.FctrId === '-'
+                )
+            ) {
                 let didSend = false;
                 let resource = RESOURCE_BATTERY;
-                const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if (toTerminal.room.controller.level === 8 || memRoom.FctrId !== '-') {
                     didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, resource, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
@@ -144,7 +162,7 @@ const Terminals = {
                 }
 
                 const max = GetMaxResourceToSell(resourceType, fromTerminal);
-                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max <= 100 ? 0 : (max + Util.TERMINAL_BUFFER))) {
+                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max <= 0 ? 0 : (max + Util.TERMINAL_BUFFER))) {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
                     if (didSell) {
@@ -454,8 +472,7 @@ const Terminals = {
                 case RESOURCE_ORGANISM: // factory lvl 5
                 case RESOURCE_DEVICE: // factory lvl 5
                 case RESOURCE_ESSENCE: // factory lvl 5
-                    return 100;
-                //return 0;
+                    return 0;
 
                 default :
                     return Util.TERMINAL_MAX_RESOURCE;
@@ -495,13 +512,17 @@ const Terminals = {
 
         /**@return {boolean}*/
         function TrySellResource(terminal, resourceType, amount) {
-            let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
+            if (amount <= 0) {
+                return false;
+            }
+            let lowestSellingValue = GetLowestSellingValue(resourceType);
             const resourceHistory = Game.market.getHistory(resourceType);
-            const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
+            const orders = Game.market.getAllOrders(order =>
+                order.resourceType === resourceType
                 && order.type === ORDER_BUY
                 && (!resourceHistory[0]
-                    || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
-                    || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.1/*small price fall is okay*/) <= order.price)
+                || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
+                || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.1/*small price fall is okay*/) <= order.price)
                 && lowestSellingValue <= order.price
                 && order.remainingAmount > 0
             );
@@ -522,6 +543,19 @@ const Terminals = {
                 }
             }
             return false;
+        }
+
+        /**@return {number}*/
+        function GetLowestSellingValue(resourceType) {
+            switch (resourceType) {
+                case RESOURCE_MACHINE: // factory lvl 5
+                case RESOURCE_ORGANISM: // factory lvl 5
+                case RESOURCE_DEVICE: // factory lvl 5
+                case RESOURCE_ESSENCE: // factory lvl 5
+                    return 500000;
+                default :
+                    return 1.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
+            }
         }
 
         /**@return {boolean}*/

@@ -28,7 +28,7 @@ const AssignJobs = {
         // loop through vacant jobs per room and see if an idle creep could be assigned or a new creep should be spawned
         function AssignOrSpawnCreeps() {
             const idleCreeps = _.filter(Game.creeps, function (creep) {
-                if (Memory.creeps[creep.name].JobName) {
+                if (Memory.creeps[creep.name] && Memory.creeps[creep.name].JobName) {
                     return Memory.creeps[creep.name].JobName.startsWith('idle');
                 } else {
                     return false;

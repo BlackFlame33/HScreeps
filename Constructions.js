@@ -30,7 +30,7 @@ const Constructions = {
                 }
                 const flags = gameRoom.find(FIND_FLAGS, {
                     filter: function (flag) { // construction flags
-                        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY; // construct first spawn
+                        return Util.IsConstructSpawnFlag(flag);
                     }
                 });
                 let isBuildingCounter = 0;
@@ -72,13 +72,13 @@ const Constructions = {
                                         if (level === 8) {
                                             isBuildingCounter += ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN, mainSpawn);
                                             isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, mainSpawn, 8);
-                                            isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_NUKER, mainSpawn, 8);
+                                            isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_NUKER, mainSpawn, 7);
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
                                             isBuildingCounter += ConstructPerimeter(gameRoom, mainSpawn);
-                                            isBuildingCounter += ConstructLabs(gameRoom, roomTerrain); // TODO
+                                            isBuildingCounter += ConstructLabs(gameRoom, roomTerrain, mainSpawn);
                                         }
                                     }
                                 }
@@ -180,7 +180,7 @@ const Constructions = {
         /**@return {number}*/
         function ConstructFirstSpawnAtFlag(gameRoom, flags) {
             const constructSpawnFlag = _.filter(flags, function (flag) {
-                return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                return Util.IsConstructSpawnFlag(flag);
             })[0];
             if (constructSpawnFlag) {
                 // cleanup
@@ -203,7 +203,7 @@ const Constructions = {
                 const defenderFlagName = 'Defend build site ' + gameRoom.name;
                 const defenderFlag = constructSpawnFlag.pos.findInRange(FIND_FLAGS, 1, {
                     filter: function (flag) {
-                        return flag.name === defenderFlagName && flag.color === COLOR_RED && flag.secondaryColor === COLOR_RED;
+                        return flag.name === defenderFlagName && Util.IsDefenderFlag(flag);
                     }
                 })[0];
                 if (!defenderFlag) {
@@ -244,7 +244,9 @@ const Constructions = {
                     isBuildingCounter++;
                 }
             }
-            Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + findType + ' ' + (structureType ? structureType : '') + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + findType + ' ' + (structureType ? structureType : '') + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -255,8 +257,9 @@ const Constructions = {
                 return 0;
             }
             const isBuildingCounter = BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, mainSpawn.pos, acceptedNumOfNearbyWalls);
-
-            Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + mainSpawn + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + mainSpawn + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -286,7 +289,9 @@ const Constructions = {
                     Util.InfoLog('Constructions', 'ConstructRampartsOn', structure.pos + ' to protect ' + structureType + ' result ' + result + ' built ' + isBuildingCounter);
                 }
             }
-            Util.Info('Constructions', 'ConstructRampartsOn', gameRoom.name + ' ' + structureType + ' structuresToPlaceRampartOn ' + structuresToPlaceRampartOn + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructRampartsOn', gameRoom.name + ' ' + structureType + ' structuresToPlaceRampartOn ' + structuresToPlaceRampartOn + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -297,6 +302,7 @@ const Constructions = {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_LAB
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_TERMINAL
                         || structure.structureType === STRUCTURE_STORAGE
@@ -309,6 +315,7 @@ const Constructions = {
                 filter: function (construction) {
                     return construction.structureType === STRUCTURE_SPAWN
                         || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_LAB
                         || construction.structureType === STRUCTURE_TOWER
                         || construction.structureType === STRUCTURE_TERMINAL
                         || construction.structureType === STRUCTURE_STORAGE
@@ -354,7 +361,9 @@ const Constructions = {
                 const source = sources[sourceCount];
                 isBuildingCounter += BuildRoadTo(spawn.pos, source.pos);
             }
-            Util.Info('Constructions', 'ConstructRoads', gameRoom.name + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructRoads', gameRoom.name + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -408,7 +417,9 @@ const Constructions = {
                     }
                 }
             }
-            Util.Info('Constructions', 'ConstructLinks', gameRoom.name + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructLinks', gameRoom.name + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -433,7 +444,9 @@ const Constructions = {
                     }
                 }
             }
-            Util.Info('Constructions', 'ConstructExtractor', gameRoom.name + ' mineral ' + mineral + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructExtractor', gameRoom.name + ' mineral ' + mineral + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -457,7 +470,9 @@ const Constructions = {
                     isBuildingCounter++;
                 }
             }
-            Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -470,6 +485,7 @@ const Constructions = {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_LAB
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_TERMINAL
                         || structure.structureType === STRUCTURE_FACTORY
@@ -482,6 +498,7 @@ const Constructions = {
                 filter: function (construction) {
                     return construction.structureType === STRUCTURE_SPAWN
                         || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_LAB
                         || construction.structureType === STRUCTURE_TOWER
                         || construction.structureType === STRUCTURE_TERMINAL
                         || construction.structureType === STRUCTURE_FACTORY
@@ -502,10 +519,15 @@ const Constructions = {
                 const coreStructure = coreStructures[coreStructureKey];
                 for (let i = -3; i <= 3; i++) {
                     for (let e = -3; e <= 3; e++) {
-                        if (i === -3 || i === 3 || e === -3 || e === 3) {
-                            map[i + coreStructure.pos.x][e + coreStructure.pos.y]++;
-                        } else {
-                            map[i + coreStructure.pos.x][e + coreStructure.pos.y] = 10;
+                        const ixpos = i + coreStructure.pos.x;
+                        const eypos = e + coreStructure.pos.y;
+                        if(ixpos >= 0 && ixpos < 50
+                        && eypos >= 0 && eypos < 50){
+                            if (i === -3 || i === 3 || e === -3 || e === 3) {
+                                map[ixpos][eypos]++;
+                            } else {
+                                map[ixpos][eypos] = 10;
+                            }
                         }
                     }
                 }
@@ -536,10 +558,42 @@ const Constructions = {
         }
 
         /**@return {number}*/
-        function ConstructLabs(gameRoom, roomTerrain) {
-            // TODO construct labs
+        function ConstructLabs(gameRoom, roomTerrain, mainSpawn) {
+            let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_LAB);
+            if (!mainSpawn || !numberOfPossibleConstructions) {
+                return 0;
+            }
             let isBuildingCounter = 0;
-            Util.Info('Constructions', 'ConstructLabs', gameRoom.name + ' TODO!' + ' built ' + isBuildingCounter);
+            let mainLab;
+            if (!Memory.MemRooms[gameRoom.name].MainLabId) {
+                mainLab = gameRoom.find(FIND_STRUCTURES, {
+                    filter: function (structure) {
+                        return structure.structureType === STRUCTURE_LAB;
+                    }
+                })[0];
+                if (!mainLab) {
+                    mainLab = gameRoom.find(FIND_MY_CONSTRUCTION_SITES, {
+                        filter: function (structure) {
+                            return structure.structureType === STRUCTURE_LAB;
+                        }
+                    })[0];
+                }
+                if (mainLab) {
+                    Memory.MemRooms[gameRoom.name].MainLabId = mainLab.id;
+                } else {
+                    isBuildingCounter = BuildCheckeredPattern(gameRoom, STRUCTURE_LAB, roomTerrain, 1, mainSpawn.pos, 0);
+                }
+            } else {
+                mainLab = Game.getObjectById(Memory.MemRooms[gameRoom.name].MainLabId);
+                if(mainLab){
+                    isBuildingCounter = BuildCheckeredPattern(gameRoom, STRUCTURE_LAB, roomTerrain, numberOfPossibleConstructions, mainLab.pos, 7);
+                }else{
+                    delete Memory.MemRooms[gameRoom.name].MainLabId; // when it goes from a construction to a structure it changes id
+                }
+            }
+            if(isBuildingCounter) {
+                Util.Info('Constructions', 'ConstructLabs', gameRoom.name + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -567,8 +621,9 @@ const Constructions = {
             const x = structure.pos.x + modX;
             const y = structure.pos.y + modY;
             let isBuildingCounter = 0;
+            const structuresAtPos = gameRoom.lookForAt(LOOK_STRUCTURES, x, y);
             if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
-                && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
+                && (!structuresAtPos.length || structuresAtPos.length < 2 && structuresAtPos[0].structureType === STRUCTURE_RAMPART)) {
                 let result = gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
                 if (result === OK) {
                     isBuildingCounter++;
@@ -623,12 +678,14 @@ const Constructions = {
                 const pathStep = pathFinder.path[pathStepCount];
                 if (Game.rooms[pathStep.roomName]) {
                     let result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
-                    if(result === OK){
+                    if (result === OK) {
                         isBuildingCounter++;
                     }
                 }
             }
-            Util.InfoLog('Constructions', 'BuildRoadTo', 'fromPos ' + fromPos + ' toPos ' + toPos + ' built ' + isBuildingCounter);
+            if(isBuildingCounter) {
+                Util.InfoLog('Constructions', 'BuildRoadTo', 'fromPos ' + fromPos + ' toPos ' + toPos + ' built ' + isBuildingCounter);
+            }
             return isBuildingCounter;
         }
 
@@ -701,7 +758,7 @@ const Constructions = {
                             if ((!terrain || terrain === 2)) { // plan and swamp is buildable
                                 const lookAtObjects = gameRoom.lookAt(newBuildPos.x, newBuildPos.y);
                                 const hasStructure = _.find(lookAtObjects, function (lookObject) {
-                                    return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
+                                    return (lookObject.type === LOOK_STRUCTURES && lookObject.structure.structureType !== STRUCTURE_RAMPART || lookObject.type === LOOK_CONSTRUCTION_SITES);
                                 });
                                 if (!hasStructure) {
                                     let numOfNearbyWalls = NumOfNearbyWalls(roomTerrain, newBuildPos);
@@ -718,6 +775,7 @@ const Constructions = {
                                                     && structure.structureType !== STRUCTURE_OBSERVER
                                                     && structure.structureType !== STRUCTURE_CONTAINER
                                                     && structure.structureType !== STRUCTURE_ROAD
+                                                    && structure.structureType !== STRUCTURE_LAB
                                                     && structure.structureType !== STRUCTURE_RAMPART;
                                             }
                                         });

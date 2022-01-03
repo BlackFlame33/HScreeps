@@ -6,7 +6,7 @@ const Labs = {
             if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
                 const flags = gameRoom.find(FIND_FLAGS, {
                     filter: function (flag) {
-                        return flag.color === COLOR_PURPLE;
+                        return Util.IsLabFlag(flag);
                     }
                 });
                 for (const flagKey in flags) {
